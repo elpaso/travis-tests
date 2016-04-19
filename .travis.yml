@@ -1,0 +1,20 @@
+language: python
+python:
+  - "2.7"
+cache:
+  directories:
+  - "$HOME/.cache/pip"
+  - "$HOME/.pyenv"
+matrix:
+  include:
+  - os: linux
+    dist: trusty
+    python: '2.6'
+install:
+    - pip install -r requirements.txt --use-mirrors
+    - pip install pep8
+    - "./.travis/install.sh"
+script:
+    - nose2
+    - pep8 travis_tests.py
+    - "./.travis/run.sh"
