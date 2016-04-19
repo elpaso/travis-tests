@@ -1,20 +1,21 @@
 language: python
 python:
   - "2.7"
-cache:
-  directories:
-  - "$HOME/.cache/pip"
-  - "$HOME/.pyenv"
-before_script:
-  - curl http://qgis.org/downloads/qgis-2015.gpg.key | sudo apt-key add -
-  - echo "deb http://qgis.org/debian trusty main" | sudo tee -a /etc/apt/sources.list
-  - sudo apt-get update -qq
-  - sudo apt-get install qgis python-qgis-common python-qgis
+virtualenv:
+      system_site_packages: true
 install:
     - pip install nose2
     - pip install pep8
     - pip install -r requirements.txt --use-mirrors
     - "./.travis/install.sh"
+    - echo "deb http://qgis.org/debian $(lsb_release -cs) main" | sudo tee -a /etc/apt/sources.list
+    - echo "deb-src http://qgis.org/debian $(lsb_release -cs) main" | sudo tee -a /etc/apt/sources.list
+    - gpg --keyserver keyserver.ubuntu.com --recv 997D3880
+    - gpg --export --armor 997D3880 | sudo apt-key add -
+    - sudo apt-get update -qq
+    - sudo apt-get install python-qt4
+    - sudo apt-get install qgis --force-yes
+    - sudo apt-get install python-qgis
 script:
     - nose2
     - pep8 travis_tests.py
