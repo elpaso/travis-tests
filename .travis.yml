@@ -5,16 +5,11 @@ cache:
   directories:
   - "$HOME/.cache/pip"
   - "$HOME/.pyenv"
-matrix:
-  include:
-  - os: linux
-    dist: trusty
-    python: '2.7'
-addons:
-  apt:
-    packages:
-    - python-qgis
-
+before_script:
+  - curl http://qgis.org/downloads/qgis-2015.gpg.key | sudo apt-key add -
+  - echo "deb http://qgis.org/debian trusty main" | sudo tee -a /etc/apt/sources.list
+  - sudo apt-get update -qq
+  - sudo apt-get install python-qgis
 install:
     - pip install nose2
     - pip install pep8
