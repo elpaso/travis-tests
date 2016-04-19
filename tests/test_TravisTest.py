@@ -1,6 +1,5 @@
 
 import unittest
-import sys
 from travis_tests import TravisTests
 
 
@@ -31,3 +30,10 @@ class TravisTestsTests(unittest.TestCase):
         """Test funcB function fails"""
         c = TravisTests()
         self.assertNotEqual(c.funcB(), '')
+
+    def test_QGIS_is_available(self):
+        """Test QGIS bindings can be imported"""
+        try:
+            from qgis import core
+        except ImportError:
+            self.fail("QGIS binding are not available")
