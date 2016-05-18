@@ -68,8 +68,9 @@ if iface is None:
         me,
         sys.argv[-1],
     ]
+    print("QGIS Test Runner - launching QGIS ...")
     out, returncode = run("sh -c " + quote(' '.join(args)), withexitstatus=1)
-    print("QGIS Test Runner starting...")
+    print("QGIS Test Runner - QGIS exited with returncode: %d" % returncode)
     ok = out.find('(failures=') < 0 and \
         len(re.findall(r'Ran \d+ tests in\s',
                        out, re.MULTILINE)) > 0
@@ -79,7 +80,7 @@ if iface is None:
         print(out)
     if len(out) == 0:
         print("QGIS Test Runner - [WARNING] subprocess returned no output")
-    print("QGIS Test Runner - QGIS returncode: %d" % returncode)
+
     print("QGIS Test Runner - finished with exit code: %d" % (0 if ok else 1))
     sys.exit(0 if ok else 1)
 
@@ -97,27 +98,24 @@ else: # We are inside QGIS!
         """
         Run the test specified as last argument in the command line.
         """
-        with CaptureOutput() as capturer:
+        try:
+            test_module_name = QgsApplication.instance().argv()[-1]
+
+            print("Trying to import %s" % test_module_name)
             try:
-                test_module_name = QgsApplication.instance().argv()[-1]
-
+                test_module = importlib.import_module(test_module_name)
+                function_name = 'run_all'
+            except ImportError, e:
+                # Strip latest name
+                pos = test_module_name.rfind('.')
+                if pos <= 0:
+                    raise e
+                test_module_name, function_name = test_module_name[:pos], test_module_name[pos+1:]
                 print("Trying to import %s" % test_module_name)
-                try:
-                    test_module = importlib.import_module(test_module_name)
-                    function_name = 'run_all'
-                except ImportError, e:
-                    # Strip latest name
-                    pos = test_module_name.rfind('.')
-                    if pos <= 0:
-                        raise e
-                    test_module_name, function_name = test_module_name[:pos], test_module_name[pos+1:]
-                    print("Trying to import %s" % test_module_name)
-                    test_module = importlib.import_module(test_module_name)
-                getattr(test_module, function_name)()
-                eprint(capturer.get_text())
-            except Exception, e:
-                eprint("QGIS Test Runner exception: %s" % e)
-
+                test_module = importlib.import_module(test_module_name)
+            getattr(test_module, function_name)()
+        except Exception, e:
+            eprint("QGIS Test Runner exception: %s" % e)
         app = QgsApplication.instance()
         os.kill(app.applicationPid(), signal.SIGTERM)
 
