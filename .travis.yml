@@ -1,3 +1,5 @@
+sudo: required
+dist: trusty
 language: python
 python:
     - "2.7"
@@ -25,6 +27,7 @@ before_script:
     - echo '[Qgis]' > QGIS/QGIS2.ini
     - export QGIS_VERSION=`python -c "import qgis.utils; print(''.join(qgis.utils.QGis.QGIS_VERSION.split('.')[:2]))"`
     - echo "showTips${QGIS_VERSION}=false" >> QGIS/QGIS2.ini
+    - grep  showTips  QGIS/QGIS2.ini
 script:
     - grep  showTips  QGIS/QGIS2.ini
     - python travis_tests/qgis_testrunner.py travis_tests.faketest
