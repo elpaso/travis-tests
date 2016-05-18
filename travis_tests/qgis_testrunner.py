@@ -27,7 +27,7 @@
         geoserverexplorer.test.catalogtests.run_my
 
     ---------------------
-    Date                 : April 2016
+    Date                 : May 2016
     Copyright            : (C) 2016 by Alessandro Pasotti
     Email                : apasotti at boundlessgeo dot com
 ***************************************************************************
