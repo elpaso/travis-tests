@@ -55,7 +55,7 @@ from pipes import quote
 from qgis.utils import iface
 
 def eprint(*args, **kwargs):
-    print(*args, file=sys.stderr, **kwargs)
+    print(*args, file=sys.__stderr__, **kwargs)
 
 def __get_test_function(test_module_name):
     """
@@ -93,12 +93,12 @@ if iface is None:
         me = sys.argv[0]
     args = [
         'qgis',
+        os.environ.get('QGIS_EXTRA_OPTIONS', ''),
         '--nologo',
         '--noversioncheck',
         '--code',
         me,
-        test_module_name,
-        os.environ.get('QGIS_EXTRA_OPTIONS', ''),
+        test_module_name, # Must be the last one!
     ]
     command_line = ' '.join(args)
     print("QGIS Test Runner - launching QGIS as %s ..." % command_line)
