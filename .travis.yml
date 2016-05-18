@@ -15,6 +15,7 @@ install:
     #- grep  showTips  QGIS/QGIS2.ini
     - echo ${TRAVIS_BUILD_DIR}
     - docker run -d --name qgis-desktop -v ${TRAVIS_BUILD_DIR}:/tests_directory -e DISPLAY=:99 qgis-desktop
+    - sleep 10
     - docker ps -a
 script:
     - docker exec -it qgis-desktop sh -c "cd /tests_directory && qgis_testrunner.py travis_tests.test_TravisTest"
