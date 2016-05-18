@@ -12,9 +12,13 @@
     the dotted path to be the function name and the previous part to be the
     module.
 
+    Extra options for QGIS command line can be passed in the env var
+    QGIS_EXTRA_OPTIONS
+
     Example run:
 
     # Will load geoserverexplorer.test.catalogtests and run `run_all`
+    QGIS_EXTRA_OPTIONS='--optionspath .' \
     GSHOSTNAME=localhost python qgis_testrunner.py \
         geoserverexplorer.test.catalogtests
 
@@ -74,7 +78,6 @@ def __get_test_function(test_module_name):
             return None
     return getattr(test_module, function_name, None)
 
-
 if iface is None:
     """
     Launch QGIS and passes itself as an init script
@@ -95,9 +98,11 @@ if iface is None:
         '--code',
         me,
         test_module_name,
+        os.environ.get('QGIS_EXTRA_OPTIONS', ''),
     ]
-    print("QGIS Test Runner - launching QGIS ...")
-    out, returncode = run("sh -c " + quote(' '.join(args)), withexitstatus=1)
+    command_line = ' '.join(args)
+    print("QGIS Test Runner - launching QGIS as %s ..." % command_line)
+    out, returncode = run("sh -c " + quote(command_line), withexitstatus=1)
     print("QGIS Test Runner - QGIS exited with returncode: %s" % returncode)
     ok = out.find('(failures=') < 0 and \
         len(re.findall(r'Ran \d+ tests in\s',
