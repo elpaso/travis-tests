@@ -23,5 +23,6 @@ before_script:
     # Wait for xvfb to start
     - sleep 3
 script:
-    - python travis_tests/qgis_testrunner.py travis_tests.test_TravisTest
-    - python travis_tests/qgis_testrunner.py travis_tests.faketest
+    - qgis -f travis_tests/qgis_testrunner.py travis_tests.faketest
+    #- python travis_tests/qgis_testrunner.py travis_tests.test_TravisTest
+    #- python travis_tests/qgis_testrunner.py travis_tests.faketest
