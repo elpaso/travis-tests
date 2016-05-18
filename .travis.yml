@@ -11,7 +11,7 @@ install:
     - export QGIS_EXTRA_OPTIONS='--optionspath .'
     - export DISPLAY=:99.0
     - pip install
-    - pip install -r requirements.txt --use-mirrors
+    - pip install -r requirements.txt
     - "./.travis/install.sh"
     - echo "deb http://qgis.org/debian $(lsb_release -cs) main" | sudo tee -a /etc/apt/sources.list
     - echo "deb-src http://qgis.org/debian $(lsb_release -cs) main" | sudo tee -a /etc/apt/sources.list
