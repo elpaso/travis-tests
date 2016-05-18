@@ -29,8 +29,5 @@ before_script:
     - echo "showTips${QGIS_VERSION}=false" >> QGIS/QGIS2.ini
     - grep  showTips  QGIS/QGIS2.ini
 script:
-    - grep  showTips  QGIS/QGIS2.ini
     - python travis_tests/qgis_testrunner.py travis_tests.faketest
-    - grep  showTips  QGIS/QGIS2.ini
-    - qgis -f travis_tests/qgis_testrunner.py travis_tests.faketest
     #- python travis_tests/qgis_testrunner.py travis_tests.test_TravisTest
