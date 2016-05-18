@@ -77,6 +77,7 @@ if iface is None:
         eprint(out)
     else:
         print(out)
+    print("QGIS Test Runner QGIS returncode: %d" % returncode)
     print("QGIS Test Runner finished with exit code: %d" % (0 if ok else 1))
     sys.exit(0 if ok else 1)
 
