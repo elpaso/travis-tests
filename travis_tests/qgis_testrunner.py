@@ -57,7 +57,7 @@ def __get_test_function(test_module_name):
     """
     Load the test module and return the test function
     """
-    print("Trying to import %s" % test_module_name)
+    print("QGIS Test Runner - Trying to import %s" % test_module_name)
     try:
         test_module = importlib.import_module(test_module_name)
         function_name = 'run_all'
@@ -67,7 +67,7 @@ def __get_test_function(test_module_name):
         if pos <= 0:
             raise e
         test_module_name, function_name = test_module_name[:pos], test_module_name[pos+1:]
-        print("Trying to import %s" % test_module_name)
+        print("QGIS Test Runner - Trying to import %s" % test_module_name)
         test_module = importlib.import_module(test_module_name)
     return getattr(test_module, function_name, None)
 
