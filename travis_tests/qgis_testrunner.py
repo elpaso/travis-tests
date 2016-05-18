@@ -53,10 +53,33 @@ from qgis.utils import iface
 def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
 
+def __get_test_function(test_module_name):
+    """
+    Load the test module and return the test function
+    """
+    print("Trying to import %s" % test_module_name)
+    try:
+        test_module = importlib.import_module(test_module_name)
+        function_name = 'run_all'
+    except ImportError, e:
+        # Strip latest name
+        pos = test_module_name.rfind('.')
+        if pos <= 0:
+            raise e
+        test_module_name, function_name = test_module_name[:pos], test_module_name[pos+1:]
+        print("Trying to import %s" % test_module_name)
+        test_module = importlib.import_module(test_module_name)
+    return getattr(test_module, function_name, None)
+
+
 if iface is None:
     """
     Launch QGIS and passes itself as an init script
     """
+    test_module_name = sys.argv[-1]
+    if __get_test_function(test_module_name) is None:
+        print("QGIS Test Runner - [ERROR] cannot load test function from %s" % test_module_name)
+        sys.exit(1)
     try:
         me = __file__
     except NameError:
@@ -66,7 +89,7 @@ if iface is None:
         '--nologo',
         '-f',
         me,
-        sys.argv[-1],
+        test_module_name,
     ]
     print("QGIS Test Runner - launching QGIS ...")
     out, returncode = run("sh -c " + quote(' '.join(args)), withexitstatus=1)
@@ -100,22 +123,11 @@ else: # We are inside QGIS!
         """
         try:
             test_module_name = QgsApplication.instance().argv()[-1]
-
-            print("Trying to import %s" % test_module_name)
-            try:
-                test_module = importlib.import_module(test_module_name)
-                function_name = 'run_all'
-            except ImportError, e:
-                # Strip latest name
-                pos = test_module_name.rfind('.')
-                if pos <= 0:
-                    raise e
-                test_module_name, function_name = test_module_name[:pos], test_module_name[pos+1:]
-                print("Trying to import %s" % test_module_name)
-                test_module = importlib.import_module(test_module_name)
-            getattr(test_module, function_name)()
+            function_name = __get_test_function(test_module_name)
+            if function_name is None:
+                eprint("QGIS Test Runner Inside - [ERROR] cannot load test function from %s" % test_module_name)
         except Exception, e:
-            eprint("QGIS Test Runner exception: %s" % e)
+            eprint("QGIS Test Runner Inside - [ERROR] Exception: %s" % e)
         app = QgsApplication.instance()
         os.kill(app.applicationPid(), signal.SIGTERM)
 
