@@ -3,7 +3,9 @@ dist: trusty
 services:
     - docker
 before_install:
-    - docker build -t qgis-desktop-docker .
+    - pushd .
+    - cd qgis-desktop-docker && docker build -t qgis-desktop .
+    - popd
     #- docker pull elpaso/qgis-desktop:2.14
 install:
     # Create a qgis config file and disable tips
