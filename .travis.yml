@@ -1,33 +1,18 @@
 sudo: required
 dist: trusty
-language: python
-python:
-    - "2.7"
+services:
+    - docker
 before_install:
-    - sh -e /etc/init.d/xvfb start
-virtualenv:
-      system_site_packages: true
+    - docker build -t qgis-desktop-docker .
+    #- docker pull elpaso/qgis-desktop:2.14
 install:
-    - export QGIS_EXTRA_OPTIONS='--optionspath .'
-    - export DISPLAY=:99.0
-    - pip install
-    - pip install -r requirements.txt
-    - "./.travis/install.sh"
-    - echo "deb http://qgis.org/debian $(lsb_release -cs) main" | sudo tee -a /etc/apt/sources.list
-    - echo "deb-src http://qgis.org/debian $(lsb_release -cs) main" | sudo tee -a /etc/apt/sources.list
-    - gpg --keyserver keyserver.ubuntu.com --recv 3FF5FFCAD71472C4
-    - gpg --export --armor 3FF5FFCAD71472C4 | sudo apt-key add -
-    - sudo apt-get update
-    - sudo apt-get install python-qt4 -qq
-    - sudo apt-get install qgis --force-yes -qq
-    - sudo apt-get install python-qgis -qq
-before_script:
     # Create a qgis config file and disable tips
     - mkdir QGIS
     - echo '[Qgis]' > QGIS/QGIS2.ini
-    - export QGIS_VERSION=`python -c "import qgis.utils; print(''.join(qgis.utils.QGis.QGIS_VERSION.split('.')[:2]))"`
     - echo "showTips${QGIS_VERSION}=false" >> QGIS/QGIS2.ini
     - grep  showTips  QGIS/QGIS2.ini
+    - docker run -d --name qgis-desktop ${TRAVIS_BUILD_DIR}:/test_directory -v ${HOME}/qgishome:/qgishome -e DISPLAY=:99 qgis-desktop
+    - docker ps -a
+    - export QGIS_EXTRA_OPTIONS=""--optionspath ${HOME}/qgishome"
 script:
-    - python travis_tests/qgis_testrunner.py travis_tests.faketest
-    #- python travis_tests/qgis_testrunner.py travis_tests.test_TravisTest
+    - docker exec -it qgis-desktop sh -c "cd /tests_directory && qgis_testrunner.py travis_tests.test_TravisTest"
