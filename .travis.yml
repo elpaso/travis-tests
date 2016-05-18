@@ -19,8 +19,13 @@ install:
     - sudo apt-get install python-qt4 -qq
     - sudo apt-get install qgis --force-yes -qq
     - sudo apt-get install python-qgis -qq
-
+before_script:
+    # Create a qgis config file and disable tips
+    - qgis&
+    - sleep 2 && killall -9 qgis.bin
+    - sed -i -e 's/showTips\([[:digit:]]\+\)=true/showTips\1=false/' ${HOME}/.config/QGIS/QGIS2.conf
 script:
+    - grep  showTips ${HOME}/.config/QGIS/QGIS2.conf
     - python travis_tests/qgis_testrunner.py travis_tests.faketest
     - qgis -f travis_tests/qgis_testrunner.py travis_tests.faketest
     #- python travis_tests/qgis_testrunner.py travis_tests.test_TravisTest

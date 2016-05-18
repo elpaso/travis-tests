@@ -68,7 +68,10 @@ def __get_test_function(test_module_name):
             raise e
         test_module_name, function_name = test_module_name[:pos], test_module_name[pos+1:]
         print("QGIS Test Runner - Trying to import %s" % test_module_name)
-        test_module = importlib.import_module(test_module_name)
+        try:
+            test_module = importlib.import_module(test_module_name)
+        except ImportError:
+            return None
     return getattr(test_module, function_name, None)
 
 
@@ -76,6 +79,7 @@ if iface is None:
     """
     Launch QGIS and passes itself as an init script
     """
+    sys.path.append(os.getcwd())
     test_module_name = sys.argv[-1]
     if __get_test_function(test_module_name) is None:
         print("QGIS Test Runner - [ERROR] cannot load test function from %s" % test_module_name)
@@ -87,13 +91,14 @@ if iface is None:
     args = [
         'qgis',
         '--nologo',
-        '-f',
+        '--noversioncheck',
+        '--code',
         me,
         test_module_name,
     ]
     print("QGIS Test Runner - launching QGIS ...")
     out, returncode = run("sh -c " + quote(' '.join(args)), withexitstatus=1)
-    print("QGIS Test Runner - QGIS exited with returncode: %d" % returncode)
+    print("QGIS Test Runner - QGIS exited with returncode: %s" % returncode)
     ok = out.find('(failures=') < 0 and \
         len(re.findall(r'Ran \d+ tests in\s',
                        out, re.MULTILINE)) > 0
@@ -104,7 +109,7 @@ if iface is None:
     if len(out) == 0:
         print("QGIS Test Runner - [WARNING] subprocess returned no output")
 
-    print("QGIS Test Runner - finished with exit code: %d" % (0 if ok else returncode))
+    print("QGIS Test Runner - finished with exit code: %s" % (0 if ok else returncode))
     sys.exit(0 if ok else 1)
 
 else: # We are inside QGIS!
@@ -112,7 +117,6 @@ else: # We are inside QGIS!
     from qgis.core import QgsApplication
     from PyQt.QtCore import QDir
     from qgis.utils import iface
-    from capturer import CaptureOutput
 
     # Add current working dir to the python path
     sys.path.append(QDir.current().path())
@@ -121,14 +125,15 @@ else: # We are inside QGIS!
         """
         Run the test specified as last argument in the command line.
         """
+        eprint("QGIS Test Runner Inside - starting the tests ...")
         try:
             test_module_name = QgsApplication.instance().argv()[-1]
             function_name = __get_test_function(test_module_name)
             if function_name is None:
                 eprint("QGIS Test Runner Inside - [ERROR] cannot load test function from %s" % test_module_name)
+            function_name()
         except Exception, e:
             eprint("QGIS Test Runner Inside - [ERROR] Exception: %s" % e)
         app = QgsApplication.instance()
         os.kill(app.applicationPid(), signal.SIGTERM)
-
     iface.initializationCompleted.connect(__run_test)
