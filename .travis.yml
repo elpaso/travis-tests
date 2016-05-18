@@ -13,7 +13,7 @@ install:
     - echo '[Qgis]' > QGIS/QGIS2.ini
     - echo "showTips${QGIS_VERSION}=false" >> QGIS/QGIS2.ini
     - grep  showTips  QGIS/QGIS2.ini
-    - docker run -d --name qgis-desktop ${TRAVIS_BUILD_DIR}:/test_directory -v ${HOME}/qgishome:/qgishome -e DISPLAY=:99 qgis-desktop
+    - docker run -d --name qgis-desktop -v ${TRAVIS_BUILD_DIR}:/test_directory -v ${HOME}/qgishome:/qgishome -e DISPLAY=:99 qgis-desktop
     - docker ps -a
     - export QGIS_EXTRA_OPTIONS=""--optionspath ${HOME}/qgishome"
 script:
