@@ -3,7 +3,7 @@ A fake python module to test travis builds
 """
 
 
-class TravisTests(object):
+class TClass(object):
 
     def funcA(self):
         return 'A'

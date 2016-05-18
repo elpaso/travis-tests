@@ -4,19 +4,24 @@ python:
 virtualenv:
       system_site_packages: true
 install:
-    - pip install nose2
-    - pip install pep8
+    - pip install
     - pip install -r requirements.txt --use-mirrors
     - "./.travis/install.sh"
     - echo "deb http://qgis.org/debian $(lsb_release -cs) main" | sudo tee -a /etc/apt/sources.list
     - echo "deb-src http://qgis.org/debian $(lsb_release -cs) main" | sudo tee -a /etc/apt/sources.list
-    - gpg --keyserver keyserver.ubuntu.com --recv 997D3880
-    - gpg --export --armor 997D3880 | sudo apt-key add -
-    - sudo apt-get update -qq
-    - sudo apt-get install python-qt4
-    - sudo apt-get install qgis --force-yes
-    - sudo apt-get install python-qgis
+    - gpg --keyserver keyserver.ubuntu.com --recv 3FF5FFCAD71472C4
+    - gpg --export --armor 3FF5FFCAD71472C4 | sudo apt-key add -
+    - sudo apt-get update
+    - sudo apt-get install python-qt4 -qq
+    - sudo apt-get install qgis --force-yes -qq
+    - sudo apt-get install python-qgis -qq
+before_script:
+    # I need a (fake) display on Travis so I need to start a X server.
+    - export DISPLAY=:99.0
+    - export PYTHONPATH=$PYTHONPATH:/usr/share/qgis/python/:/usr/lib/python2.7/dist-packages/
+    - /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1400x900x24 -ac +extension GLX +render
+    # Wait for xvfb to start
+    - sleep 3
 script:
-    - nose2
-    - pep8 travis_tests.py
-    - "./.travis/run.sh"
+    - python travis_tests/qgis_testrunner.py travis_test.test_TravisTest
+    - python travis_tests/qgis_testrunner.py travis_tests.faketest
