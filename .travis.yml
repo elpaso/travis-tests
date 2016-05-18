@@ -22,10 +22,11 @@ install:
 before_script:
     # Create a qgis config file and disable tips
     - qgis&
-    - sleep 2 && killall -9 qgis.bin
+    - sleep 2 && killall -9 qgis.bin && sleep 2
     - sed -i -e 's/showTips\([[:digit:]]\+\)=true/showTips\1=false/' ${HOME}/.config/QGIS/QGIS2.conf
 script:
     - grep  showTips ${HOME}/.config/QGIS/QGIS2.conf
     - python travis_tests/qgis_testrunner.py travis_tests.faketest
+    - grep  showTips ${HOME}/.config/QGIS/QGIS2.conf
     - qgis -f travis_tests/qgis_testrunner.py travis_tests.faketest
     #- python travis_tests/qgis_testrunner.py travis_tests.test_TravisTest
