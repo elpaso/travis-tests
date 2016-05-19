@@ -40,7 +40,6 @@
 *                                                                         *
 ***************************************************************************
 """
-from __future__ import print_function
 
 __author__ = 'Alessandro Pasotti'
 __date__ = 'May 2016'
@@ -55,8 +54,8 @@ from pipes import quote
 
 from qgis.utils import iface
 
-def eprint(*args, **kwargs):
-    print(*args, file=sys.__stderr__, **kwargs)
+def eprint(text):
+    sys.__stderr__.write(text + "\n")
 
 def __get_test_function(test_module_name):
     """
@@ -105,6 +104,7 @@ if iface is None:
     command_line = ' '.join(args)
     print("QGIS Test Runner - launching QGIS as %s ..." % command_line)
     out, returncode = run("sh -c " + quote(command_line), withexitstatus=1)
+    assert returncode is not None
     print("QGIS Test Runner - QGIS exited.")
     ok = out.find('(failures=') < 0 and \
         len(re.findall(r'Ran \d+ tests in\s',
@@ -123,7 +123,7 @@ if iface is None:
 
 else: # We are inside QGIS!
     # Start as soon as the initializationCompleted signal is fired
-    from qgis.core import QgsApplication, QgsLogger
+    from qgis.core import QgsApplication
     from PyQt.QtCore import QDir
     from qgis.utils import iface
 
@@ -134,15 +134,15 @@ else: # We are inside QGIS!
         """
         Run the test specified as last argument in the command line.
         """
-        QgsLogger.debug("QGIS Test Runner Inside - starting the tests ...")
+        eprint("QGIS Test Runner Inside - starting the tests ...")
         try:
             test_module_name = QgsApplication.instance().argv()[-1]
             function_name = __get_test_function(test_module_name)
             if function_name is None:
-                QgsLogger.debug("QGIS Test Runner Inside - [ERROR] cannot load test function from %s" % test_module_name)
+                eprint("QGIS Test Runner Inside - [ERROR] cannot load test function from %s" % test_module_name)
             function_name()
         except Exception, e:
-            QgsLogger.debug("QGIS Test Runner Inside - [ERROR] Exception: %s" % e)
+            eprint("QGIS Test Runner Inside - [ERROR] Exception: %s" % e)
         app = QgsApplication.instance()
         os.kill(app.applicationPid(), signal.SIGTERM)
     iface.initializationCompleted.connect(__run_test)
