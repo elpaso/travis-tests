@@ -138,10 +138,10 @@ else: # We are inside QGIS!
             test_module_name = QgsApplication.instance().argv()[-1]
             function_name = __get_test_function(test_module_name)
             if function_name is None:
-                print("QGIS Test Runner Inside - [ERROR] cannot load test function from %s" % test_module_name)
+                eprint("QGIS Test Runner Inside - [ERROR] cannot load test function from %s" % test_module_name)
             function_name()
         except Exception, e:
-            print("QGIS Test Runner Inside - [ERROR] Exception: %s" % e)
+            eprint("QGIS Test Runner Inside - [ERROR] Exception: %s" % e)
         app = QgsApplication.instance()
         os.kill(app.applicationPid(), signal.SIGTERM)
     iface.initializationCompleted.connect(__run_test)
