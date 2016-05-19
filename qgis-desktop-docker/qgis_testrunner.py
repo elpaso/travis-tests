@@ -104,18 +104,20 @@ if iface is None:
     command_line = ' '.join(args)
     print("QGIS Test Runner - launching QGIS as %s ..." % command_line)
     out, returncode = run("sh -c " + quote(command_line), withexitstatus=1)
-    print("QGIS Test Runner - QGIS exited with returncode: %s" % returncode)
+    print("QGIS Test Runner - QGIS exited.")
     ok = out.find('(failures=') < 0 and \
         len(re.findall(r'Ran \d+ tests in\s',
                        out, re.MULTILINE)) > 0
+    print('='*60)
     if not ok:
-        eprint(out)
-    else:
         print(out)
+    else:
+        eprint(out)
     if len(out) == 0:
         print("QGIS Test Runner - [WARNING] subprocess returned no output")
+    print('='*60)
 
-    print("QGIS Test Runner - %s bytes returned and finished with exit code: %s" % (len(out), 0 if ok else returncode))
+    print("QGIS Test Runner - %s bytes returned and finished with exit code: %s" % (len(out), 0 if ok else 1))
     sys.exit(0 if ok else 1)
 
 else: # We are inside QGIS!
@@ -136,10 +138,10 @@ else: # We are inside QGIS!
             test_module_name = QgsApplication.instance().argv()[-1]
             function_name = __get_test_function(test_module_name)
             if function_name is None:
-                eprint("QGIS Test Runner Inside - [ERROR] cannot load test function from %s" % test_module_name)
+                print("QGIS Test Runner Inside - [ERROR] cannot load test function from %s" % test_module_name)
             function_name()
         except Exception, e:
-            eprint("QGIS Test Runner Inside - [ERROR] Exception: %s" % e)
+            print("QGIS Test Runner Inside - [ERROR] Exception: %s" % e)
         app = QgsApplication.instance()
         os.kill(app.applicationPid(), signal.SIGTERM)
     iface.initializationCompleted.connect(__run_test)

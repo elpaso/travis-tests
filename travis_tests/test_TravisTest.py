@@ -30,7 +30,7 @@ class TravisTestsTests(unittest.TestCase):
     def test_funcb_fails(self):
         """Test funcB function fails"""
         c = TClass()
-        self.assertNotEqual(c.funcB(), '')
+        self.assertEqual(c.funcB(), '')
 
     def test_QGIS_is_available(self):
         """Test QGIS bindings can be imported"""
