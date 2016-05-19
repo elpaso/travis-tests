@@ -115,7 +115,7 @@ if iface is None:
     if len(out) == 0:
         print("QGIS Test Runner - [WARNING] subprocess returned no output")
 
-    print("QGIS Test Runner - finished with exit code: %s" % (0 if ok else returncode))
+    print("QGIS Test Runner - %s bytes returned and finished with exit code: %s" % (len(out), 0 if ok else returncode))
     sys.exit(0 if ok else 1)
 
 else: # We are inside QGIS!
