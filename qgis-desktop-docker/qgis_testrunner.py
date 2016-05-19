@@ -92,6 +92,7 @@ if iface is None:
         me = __file__
     except NameError:
         me = sys.argv[0]
+    os.environ['QGIS_DEBUG'] = 1
     args = [
         'qgis',
         os.environ.get('QGIS_EXTRA_OPTIONS', ''),
@@ -122,7 +123,7 @@ if iface is None:
 
 else: # We are inside QGIS!
     # Start as soon as the initializationCompleted signal is fired
-    from qgis.core import QgsApplication
+    from qgis.core import QgsApplication, QgsLogger
     from PyQt.QtCore import QDir
     from qgis.utils import iface
 
@@ -133,15 +134,15 @@ else: # We are inside QGIS!
         """
         Run the test specified as last argument in the command line.
         """
-        eprint("QGIS Test Runner Inside - starting the tests ...")
+        QgsLogger.debug("QGIS Test Runner Inside - starting the tests ...")
         try:
             test_module_name = QgsApplication.instance().argv()[-1]
             function_name = __get_test_function(test_module_name)
             if function_name is None:
-                eprint("QGIS Test Runner Inside - [ERROR] cannot load test function from %s" % test_module_name)
+                QgsLogger.debug("QGIS Test Runner Inside - [ERROR] cannot load test function from %s" % test_module_name)
             function_name()
         except Exception, e:
-            eprint("QGIS Test Runner Inside - [ERROR] Exception: %s" % e)
+            QgsLogger.debug("QGIS Test Runner Inside - [ERROR] Exception: %s" % e)
         app = QgsApplication.instance()
         os.kill(app.applicationPid(), signal.SIGTERM)
     iface.initializationCompleted.connect(__run_test)
