@@ -30,7 +30,7 @@ class TravisTestsTests(unittest.TestCase):
     def test_funcb_fails(self):
         """Test funcB function fails"""
         c = TClass()
-        self.assertEqual(c.funcB(), '')
+        self.assertNotEqual(c.funcB(), '')
 
     def test_QGIS_is_available(self):
         """Test QGIS bindings can be imported"""
@@ -38,6 +38,15 @@ class TravisTestsTests(unittest.TestCase):
             from qgis import core
         except ImportError:
             self.fail("QGIS binding are not available")
+
+
+class TravisTestsFailsTests(unittest.TestCase):
+    """Tests TravisTests class."""
+
+    def test_funcb_fails(self):
+        """Test funcB function fails"""
+        c = TClass()
+        self.assertEqual(c.funcB(), '')
 
 
 def suite():
@@ -50,9 +59,10 @@ def run_all():
     unittest.TextTestRunner(verbosity=3, stream=sys.stdout).run(suite())
 
 
-def run_sleep():
-    from time import sleep
-    sleep(5)
+# run all tests using unittest skipping nose or testplugin
+def run_fail():
+    unittest.TextTestRunner(verbosity=3, stream=sys.stdout).run(unittest.makeSuite(TravisTestsFailsTests, 'test'))
+
 
 if __name__ == "__main__":
     run_all()

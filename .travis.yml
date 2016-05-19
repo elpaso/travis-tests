@@ -8,10 +8,10 @@ before_install:
     - popd
 install:
     - echo ${TRAVIS_BUILD_DIR}
-    - docker run -d --name qgis-desktop -v ${TRAVIS_BUILD_DIR}:/tests_directory -e DISPLAY=:99 qgis-desktop
+    - docker run -d --name qgis-desktop -v ${TRAVIS_BUILD_DIR}:/tests_directory -e QGIS_EXTRA_OPTIONS='--optionspath /qgishome' -e DISPLAY=:99 qgis-desktop
     - sleep 10
     - docker ps -a
 script:
     # Eureka!
-    - docker exec -it qgis-desktop sh -c "cd /tests_directory && unbuffer qgis --optionspath /qgishome --nologo -f qgis-desktop-docker/qgis_testrunner.py travis_tests.test_TravisTest  2>/dev/null | grep FAILED"
-    - docker exec -it qgis-desktop sh -c "cd /tests_directory && unbuffer qgis_testrunner.py travis_tests.test_TravisTest"
+    - docker exec -it qgis-desktop sh -c "qgis_testrunner.sh travis_tests.test_TravisTest"
+    - docker exec -it qgis-desktop sh -c "qgis_testrunner.sh travis_tests.test_TravisTest.run_fail"

@@ -8,8 +8,8 @@ MAINTAINER Alessandro Pasotti<apasotti@itopen.it>
 # --build-arg APT_CATCHER_IP=xxx.xxx.xxx.xxx,
 # set the IP to that of your apt-cacher-ng host or comment the following 2 lines
 # out if you do not want to use caching
-ARG APT_CATCHER_IP=localhost
-RUN  echo 'Acquire::http { Proxy "http://'${APT_CATCHER_IP}':3142"; };' >> /etc/apt/apt.conf.d/01proxy
+#ARG APT_CATCHER_IP=localhost
+#RUN  echo 'Acquire::http { Proxy "http://'${APT_CATCHER_IP}':3142"; };' >> /etc/apt/apt.conf.d/01proxy
 
 
 # Add repository for QGIS
@@ -42,6 +42,8 @@ COPY qgishome /qgishome
 ENV QGIS_EXTRA_OPTIONS="--optionspath /qgishome"
 ADD qgis_testrunner.py /usr/bin/qgis_testrunner.py
 RUN chmod +x /usr/bin/qgis_testrunner.py
+ADD qgis_testrunner.sh /usr/bin/qgis_testrunner.sh
+RUN chmod +x /usr/bin/qgis_testrunner.sh
 
 
 # Add start script
