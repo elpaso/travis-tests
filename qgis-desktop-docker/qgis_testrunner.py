@@ -92,7 +92,7 @@ if iface is None:
         me = __file__
     except NameError:
         me = sys.argv[0]
-    os.environ['QGIS_DEBUG'] = 1
+    os.environ['QGIS_DEBUG'] = '1'
     args = [
         'qgis',
         os.environ.get('QGIS_EXTRA_OPTIONS', ''),
