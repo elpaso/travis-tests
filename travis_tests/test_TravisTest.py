@@ -58,8 +58,7 @@ def run_all():
     # demo_test = unittest.TestLoader().loadTestsFromTestCase(CatalogTests)
     unittest.TextTestRunner(verbosity=3, stream=sys.stdout).run(suite())
 
-
-# run all tests using unittest skipping nose or testplugin
+# run all failing tests using unittest skipping nose or testplugin
 def run_fail():
     unittest.TextTestRunner(verbosity=3, stream=sys.stdout).run(unittest.makeSuite(TravisTestsFailsTests, 'test'))
 
