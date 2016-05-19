@@ -6,16 +6,12 @@ before_install:
     - pushd .
     - cd qgis-desktop-docker && docker build -t qgis-desktop .
     - popd
-    #- docker pull elpaso/qgis-desktop:2.14
 install:
-    # Create a qgis config file and disable tips
-    #- mkdir QGIS
-    #- echo '[Qgis]' > QGIS/QGIS2.ini
-    #- echo "showTips${QGIS_VERSION}=false" >> QGIS/QGIS2.ini
-    #- grep  showTips  QGIS/QGIS2.ini
     - echo ${TRAVIS_BUILD_DIR}
     - docker run -d --name qgis-desktop -v ${TRAVIS_BUILD_DIR}:/tests_directory -e DISPLAY=:99 qgis-desktop
     - sleep 10
     - docker ps -a
 script:
+    - docker exec -it qgis-desktop sh -c "cd /tests_directory && ls -la"
+    - docker exec -it qgis-desktop sh -c "cd /tests_directory && qgis --help"
     - docker exec -it qgis-desktop sh -c "cd /tests_directory && qgis_testrunner.py travis_tests.test_TravisTest"
