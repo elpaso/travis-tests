@@ -15,7 +15,8 @@ RUN apt-get install -y \
     xvfb \
     python-pip \
     python-dev \
-    supervisor
+    supervisor \
+    expect-dev
 
 # Add install script
 ADD requirements.txt /usr/local/requirements.txt
