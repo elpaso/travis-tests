@@ -104,7 +104,7 @@ if iface is None:
     command_line = ' '.join(args)
     print("QGIS Test Runner - launching QGIS as %s ..." % command_line)
     out, returncode = run("sh -c " + quote(command_line), withexitstatus=1)
-    # assert returncode is not None
+    assert returncode is not None
     print("QGIS Test Runner - QGIS exited.")
     ok = out.find('(failures=') < 0 and \
         len(re.findall(r'Ran \d+ tests in\s',
