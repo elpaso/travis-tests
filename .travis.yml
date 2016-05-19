@@ -14,4 +14,5 @@ install:
 script:
     # Eureka!
     - docker exec -it qgis-desktop sh -c "qgis_testrunner.sh travis_tests.test_TravisTest"
+    # Expected failure:
     - docker exec -it qgis-desktop sh -c "qgis_testrunner.sh travis_tests.test_TravisTest.run_fail"
