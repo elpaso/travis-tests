@@ -12,7 +12,5 @@ install:
     - sleep 10
     - docker ps -a
 script:
-    - docker exec -it qgis-desktop sh -c "cd /tests_directory && ls -la"
     - docker exec -it qgis-desktop sh -c "cd /tests_directory && unbuffer qgis --optionspath /qgishome --nologo -f qgis-desktop-docker/qgis_testrunner.py travis_tests.test_TravisTest  2>/dev/null | grep FAILED"
-    - docker exec -it qgis-desktop sh -c "cd /tests_directory && qgis --help"
-    - docker exec -it qgis-desktop sh -c "cd /tests_directory && qgis_testrunner.py travis_tests.test_TravisTest"
+    - docker exec -it qgis-desktop sh -c "cd /tests_directory && unbuffer qgis_testrunner.py travis_tests.test_TravisTest"
