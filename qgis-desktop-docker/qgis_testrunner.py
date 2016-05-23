@@ -135,6 +135,10 @@ else: # We are inside QGIS!
         Run the test specified as last argument in the command line.
         """
         eprint("QGIS Test Runner Inside - starting the tests ...")
+        # Try various ways of outputting
+        print("Normal print")
+        eprint("Normal eprint")
+        """
         try:
             test_module_name = QgsApplication.instance().argv()[-1]
             function_name = __get_test_function(test_module_name)
@@ -143,6 +147,9 @@ else: # We are inside QGIS!
             function_name()
         except Exception, e:
             eprint("QGIS Test Runner Inside - [ERROR] Exception: %s" % e)
+        """
         app = QgsApplication.instance()
         os.kill(app.applicationPid(), signal.SIGTERM)
+    print("Normal print before connect")
+    eprint("Normal eprint before connect")
     iface.initializationCompleted.connect(__run_test)
