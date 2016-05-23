@@ -1,13 +1,17 @@
 #!/bin/bash
 # Run a test inside QGIS
 ### Turn on debug mode ###
-#set -x
+set -x
 
 TEST_NAME=$1
 echo "Running test $1"
 
 cd /tests_directory
-OUTPUT=`unbuffer qgis --optionspath /qgishome --nologo --code /usr/bin/qgis_testrunner.py $TEST_NAME  2>/dev/null`
+OUTPUT=`unbuffer qgis --optionspath /qgishome --nologo --code /usr/bin/qgis_testrunner.py $TEST_NAME`
+if [ -n "$OUTPUT" ]; then
+   echo "ERROR: No output from the test runner!!!"
+   exit 1;
+fi
 echo $OUTPUT | grep -q FAILED
 RETURN_CODE=$?
 echo "$OUTPUT"
