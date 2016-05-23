@@ -1,7 +1,7 @@
 #!/bin/bash
 # Run a test inside QGIS
 ### Turn on debug mode ###
-set -x
+# set -x
 
 TEST_NAME=$1
 echo "Running test $1"
