@@ -1,3 +1,0 @@
-deb http://qgis.org/debian trusty main # disabilitato durante l'avanzamento a trusty
-deb-src http://qgis.org/debian trusty main # disabilitato durante l'avanzamento a trusty
-
