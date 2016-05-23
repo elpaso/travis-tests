@@ -12,6 +12,7 @@ install:
     - sleep 10
     - docker ps -a
 script:
+    - docker exec -it qgis-desktop sh -c "qgis --help"
     # Eureka!
     - docker exec -it qgis-desktop sh -c "qgis_testrunner.sh travis_tests.test_TravisTest"
     # Expected failure:
