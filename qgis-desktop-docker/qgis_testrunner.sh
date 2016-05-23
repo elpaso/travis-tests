@@ -15,7 +15,7 @@ if [ -z "$OUTPUT" ]; then
 fi
 RETURN_CODE=$?
 echo "$OUTPUT"
-echo "Finished running test $1 ..."
+echo "Finished running test $1."
 if [ $RETURN_CODE != 0 ];
     then exit 0;
 fi
