@@ -48,6 +48,13 @@ class TravisTestsFailsTests(unittest.TestCase):
         c = TClass()
         self.assertEqual(c.funcB(), '')
 
+class TravisTestsPythonEerror(unittest.TestCase):
+    """Tests a python error."""
+
+    def test_python_error(self):
+        """Test a python error"""
+        self.assertTrue(this_var_is_not_defined)
+
 
 def suite():
     suite = unittest.makeSuite(TravisTestsTests, 'test')
@@ -61,6 +68,10 @@ def run_all():
 # run all failing tests using unittest skipping nose or testplugin
 def run_fail():
     unittest.TextTestRunner(verbosity=3, stream=sys.stdout).run(unittest.makeSuite(TravisTestsFailsTests, 'test'))
+
+# I want a python error here
+def run_python_error():
+    unittest.TextTestRunner(verbosity=3, stream=sys.stdout).run(unittest.makeSuite(TravisTestsPythonEerror, 'test_err'))
 
 
 if __name__ == "__main__":

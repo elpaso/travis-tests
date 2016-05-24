@@ -1,4 +1,4 @@
-FROM ubuntu:trusty
+FROM kartoza/qgis-desktop:2.14.2
 MAINTAINER Alessandro Pasotti<apasotti@itopen.it>
 
 
@@ -11,21 +11,11 @@ MAINTAINER Alessandro Pasotti<apasotti@itopen.it>
 #ARG APT_CATCHER_IP=localhost
 #RUN  echo 'Acquire::http { Proxy "http://'${APT_CATCHER_IP}':3142"; };' >> /etc/apt/apt.conf.d/01proxy
 
-
-# Add repository for QGIS
-ADD debian-gis.list /etc/apt/sources.list.d/debian-gis.list
-# Add the signing key
-RUN sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key 3FF5FFCAD71472C4
-
 # Install required dependencies and QGIS itself
 RUN apt-get -y update
 RUN apt-get install -y \
     vim \
-    python-qgis \
-    qgis \
     xvfb \
-    python-pip \
-    python-dev \
     supervisor \
     expect-dev
 
