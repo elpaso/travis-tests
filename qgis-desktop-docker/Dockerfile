@@ -16,6 +16,8 @@ RUN apt-get -y update
 RUN apt-get install -y \
     vim \
     xvfb \
+    python-pip \
+    python-dev \
     supervisor \
     expect-dev
 
