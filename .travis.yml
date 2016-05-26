@@ -10,8 +10,7 @@ install:
     - echo ${TRAVIS_BUILD_DIR}
     - docker run -d --name qgis-desktop -v ${TRAVIS_BUILD_DIR}:/tests_directory -e QGIS_EXTRA_OPTIONS='--optionspath /qgishome' -e DISPLAY=:99 qgis-desktop
     - sleep 10
-    - docker exec -it qgis-desktop sh -c "qgis --help 2>&1 | head -2 | grep 'QGIS - ' | perl -npe 'chomp; s/QGIS - (\d+)\.(\d+).*/\1\2/' >> /qgishome/QGIS/QGIS2.ini"
-    - docker exec -it qgis-desktop qgis --help | head -1 | perl -npe 'chomp; s/QGIS - (\d+)\.(\d+).*/showTips\1\2=false/'
+    - docker exec -it qgis-desktop sh -c "qgis --help 2>&1 | head -2 | grep 'QGIS - ' | perl -npe 'chomp; s/QGIS - (\d+)\.(\d+).*/showTips\1\2=false/' >> /qgishome/QGIS/QGIS2.ini"
     - docker ps -a
 script:
     # Eureka!
