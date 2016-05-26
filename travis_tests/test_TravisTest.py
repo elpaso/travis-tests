@@ -43,6 +43,7 @@ class TravisTestsTests(unittest.TestCase):
 class TravisTestsFailsTests(unittest.TestCase):
     """Tests TravisTests class."""
 
+    @unittest.expectedFailure
     def test_funcb_fails(self):
         """Test funcB function fails"""
         c = TClass()
@@ -51,6 +52,7 @@ class TravisTestsFailsTests(unittest.TestCase):
 class TravisTestsPythonEerror(unittest.TestCase):
     """Tests a python error."""
 
+    @unittest.expectedFailure
     def test_python_error(self):
         """Test a python error"""
         self.assertTrue(this_var_is_not_defined)

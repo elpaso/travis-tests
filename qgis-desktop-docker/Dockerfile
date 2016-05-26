@@ -1,5 +1,5 @@
 FROM kartoza/qgis-desktop:2.14.2
-MAINTAINER Alessandro Pasotti<apasotti@itopen.it>
+MAINTAINER Alessandro Pasotti<apasotti@boundlessgeo.com>
 
 
 # Use apt-catcher-ng caching
