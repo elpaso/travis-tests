@@ -9,11 +9,12 @@ cd /tests_directory
 echo "Running test $1 ..."
 OUTPUT=`unbuffer qgis --optionspath /qgishome --nologo --code /usr/bin/qgis_testrunner.py $TEST_NAME  2>/dev/null`
 EXIT_CODE="$?"
-echo $OUTPUT | grep -q FAILED
 if [ -z "$OUTPUT" ]; then
     echo "ERROR: no output from the test runner! (exit code: ${EXIT_CODE})"
     exit 1
 fi
+echo $OUTPUT | grep -q FAILED
+RESULT_CODE="$?"
 echo "$OUTPUT"
 echo "Finished running test $1."
 if [ "$EXIT_CODE" != "0" ];
