@@ -8,8 +8,8 @@ MAINTAINER Alessandro Pasotti<apasotti@itopen.it>
 # --build-arg APT_CATCHER_IP=xxx.xxx.xxx.xxx,
 # set the IP to that of your apt-cacher-ng host or comment the following 2 lines
 # out if you do not want to use caching
-#ARG APT_CATCHER_IP=localhost
-#RUN  echo 'Acquire::http { Proxy "http://'${APT_CATCHER_IP}':3142"; };' >> /etc/apt/apt.conf.d/01proxy
+# ARG APT_CATCHER_IP=localhost
+# RUN  echo 'Acquire::http { Proxy "http://'${APT_CATCHER_IP}':3142"; };' >> /etc/apt/apt.conf.d/01proxy
 
 # Install required dependencies and QGIS itself
 RUN apt-get -y update
@@ -42,5 +42,6 @@ RUN chmod +x /usr/bin/qgis_testrunner.sh
 ADD supervisord.conf /etc/supervisor/
 ADD supervisor.xvfb.conf /etc/supervisor/supervisor.d/
 
+ENV PYTHONPATH=/usr/share/qgis/python/
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
