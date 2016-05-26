@@ -17,7 +17,7 @@ echo $OUTPUT | grep -q FAILED
 RESULT_CODE="$?"
 echo "$OUTPUT"
 echo "Finished running test $1."
-if [ "$EXIT_CODE" != "0" ];
+if [ "$RESULT_CODE" != "0" ];
     then exit 0;
 fi
 exit 1
