@@ -39,6 +39,14 @@ class TravisTestsTests(unittest.TestCase):
         except ImportError:
             self.fail("QGIS binding are not available")
 
+    def test_QGIS_iface_is_available(self):
+        """Test QGIS iface is not None"""
+        try:
+            from qgis.utils import iface
+        except ImportError:
+            self.fail("QGIS iface is not available")
+        self.assertTrue(iface is not None)
+
 
 class TravisTestsFailsTests(unittest.TestCase):
     """Tests TravisTests class."""

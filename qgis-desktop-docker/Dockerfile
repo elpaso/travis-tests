@@ -37,6 +37,10 @@ RUN chmod +x /usr/bin/qgis_testrunner.py
 ADD qgis_testrunner.sh /usr/bin/qgis_testrunner.sh
 RUN chmod +x /usr/bin/qgis_testrunner.sh
 
+# Add QGIS setup script
+ADD qgis_setup.sh /usr/local/bin/qgis_setup.sh
+RUN chmod +x /usr/local/bin/qgis_setup.sh
+RUN /usr/local/bin/qgis_setup.sh
 
 # Add start script
 ADD supervisord.conf /etc/supervisor/
