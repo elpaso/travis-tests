@@ -1,9 +1,8 @@
-qgis-desktop-docker
-============================
+qgis-testing-environment
+================================
 
 This is a simple container for testing QGIS Desktop and for
 executing unit tests inside a real QGIS instance.
-
 
 # Features
 
@@ -12,7 +11,7 @@ repositories and a python script to run unit tests inside QGIS.
 
 You can use this docker to test QGIS or to run unit tests inside QGIS,
 xvfb is available and running as a service inside the container to allow
-for fully automated headless testing.
+for fully automated headless testing in Travis CI jobs.
 
 
 # Building
@@ -20,25 +19,28 @@ for fully automated headless testing.
 You can build the image with:
 
 ```
-# Place your IP address here, if you want to use apt-catcher, or comment
-# it out in the Dockerfile
+# Place your IP address here, if you want to use apt-catcher note that APT
+# catcher is not enabled by default, in order to enable it, you should
+# uncomment two lines in the docker file (see comments in Dockerfile).
 $ export ADDR=192.168.1.1
-$ docker build -t docker-qgis-desktop --build-arg APT_CATCHER_IP=$ADDR .
+$ docker build -t qgis-testing-environment --build-arg APT_CATCHER_IP=$ADDR .
 ```
 
-# Running
+# Running QGIS
 
 To run a container, assuming that you want to use your current display to use
-QGIS:
+QGIS and the image is named `qgis-testing-environment`:
 
 ```
 # Allow connections from any host
 $ xhost +
-$ docker run --rm  -it --name qgis_desktop -v /tmp/.X11-unix:/tmp/.X11-unix  \
-    -e DISPLAY=unix$DISPLAY elpaso/qgis-desktop:2.14 qgis
+$ docker run --rm  -it --name qgis_desktop-testing-environment -v /tmp/.X11-unix:/tmp/.X11-unix  \
+    -e DISPLAY=unix$DISPLAY qgis-testing-environment qgis
 ```
 
-Suppose that you have local directoty containing the tests to execute into
+# Running unit tests inside QGIS
+
+Suppose that you have local directory containing the tests to execute into
 QGIS:
 
 ```
@@ -55,18 +57,18 @@ that is accessible by the container.
 
 
 ```
-$ docker run -d --name qgis-desktop -v /tmp/.X11-unix:/tmp/.X11-unix \
-    -v /my_tests/:/tests_directory -e DISPLAY=:99 elpaso/qgis-desktop:2.14
+$ docker run -d --name qgis-testing-environment -v /tmp/.X11-unix:/tmp/.X11-unix \
+    -v /my_tests/:/tests_directory -e DISPLAY=:99 qgis-desktop
 
 ```
 
 When done, you can invoke the test runnner (output follows, the failure is
 expected):
-```
-$ docker exec -it qgis-desktop sh -c "cd /tests_directory && qgis_testrunner.py travis_tests.test_TravisTest"
 
+```
+$ docker exec -it qgis-testing-environment sh -c "qgis_testrunner.sh travis_tests.test_TravisTest.run_fail"
 QGIS Test Runner - Trying to import travis_tests.test_TravisTest
-QGIS Test Runner - launching QGIS as qgis --optionspath /qgishome --nologo --noversioncheck --code /usr/bin/qgis_testrunner.py travis_tests.test_TravisTest ...
+QGIS Test Runner - launching QGIS as qgis --nologo --noversioncheck --code /usr/bin/qgis_testrunner.py travis_tests.test_TravisTest ...
 QGIS Test Runner - QGIS exited with returncode: 143
 Warning: QCss::Parser - Failed to load file  "/style.qss"
 QInotifyFileSystemWatcherEngine::addPaths: inotify_add_watch failed: No such file or directory
@@ -95,10 +97,65 @@ AssertionError: 'B' != ''
 Ran 4 tests in 0.001s
 
 FAILED (failures=1)
-Terminated
 ```
 
+## Options for the test runner
+
+The env var `QGIS_EXTRA_OPTIONS` defaults to an empty string and can
+contains extra parameters that are passed to QGIS by the test runner.
 
 
-------------------
-Alessandro Pasotti
+# Implementation notes
+
+The main goal of this image was to execute unit tests inside a real instance
+of QGIS (not a mocked one).
+
+The QGIS tests should be runnable from a Travis CI job.
+
+The implementation is:
+
+- run the docker, mounting as volumes the unit tests folder in `/tests_directory`
+    (or the QGIS plugin   folder if the unit tests belong to a plugin and the
+    plugin is needed to run the tests)
+- execute `qgis_setup.sh MyPluginName` script in docker that sets up QGIS to
+  avoid blocking modal dialogs  and installs the plugin into QGIS if needed
+    - create config and python plugin folders for QGIS
+    - disable tooltips in the `QGIS2.conf` file
+    - enable the plugin  in the `QGIS2.conf` file
+    - install the `startup.py` script to disable python exception modal dialogs
+- execute the tests by running `qgis_testrunner.sh MyPluginName.tests.tests_MyTestModule.run_my_tests_function`
+- the output of the tests is captured by the `test_runner.sh` script and
+  searched for `FAILED` (that is in the standard unit tests output), if
+  that string is present in the output, the script exists with `1` else
+  it exits with `0`.
+
+`qgis_testrunner.sh` accepts a dotted notation path to the test module that
+can end with the function that has to be called inside the module to run the
+tests. The last part (`.run_my_tests_function`) can be omitted and defaults to
+`run_all`.
+
+
+# Running in Travis
+
+This is a simple use case for running unit tests of a small QGIS plugin:
+
+```
+services:
+    - docker
+before_install:
+    # Build this docker:
+    # - cd qgis-testing-environment && docker build -t qgis-testing-environment .
+    # or just pull it:
+    - docker pull elpaso/qgis-testing-environment:latest
+install:
+    - docker run -d --name qgis-testing-environment -v ${TRAVIS_BUILD_DIR}:/tests_directory -e DISPLAY=:99 qgis-testing-environment
+    - sleep 10
+    # Setup qgis and enable the plugin
+    - docker exec -it qgis-testing-environment sh -c "qgis_setup.sh QuickWKT"
+    # If needd additional steps (for example make or paver setup, place it here)
+    # Link the plugin to the tests_directory
+    - docker exec -it qgis-testing-environment sh -c "ln -s /tests_directory /root/.qgis2/python/plugins/QuickWKT"
+
+script:
+    - docker exec -it qgis-testing-environment sh -c "qgis_testrunner.sh QuickWKT.tests.test_Plugin"
+```

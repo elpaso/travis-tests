@@ -1,5 +1,5 @@
-FROM kartoza/qgis-desktop:2.14.2
-MAINTAINER Alessandro Pasotti<apasotti@boundlessgeo.com>
+FROM ubuntu:trusty
+MAINTAINER Alessandro Pasotti <apasotti@boundlessgeo.com>
 
 
 # Use apt-catcher-ng caching
@@ -8,11 +8,24 @@ MAINTAINER Alessandro Pasotti<apasotti@boundlessgeo.com>
 # --build-arg APT_CATCHER_IP=xxx.xxx.xxx.xxx,
 # set the IP to that of your apt-cacher-ng host or comment the following 2 lines
 # out if you do not want to use caching
-# ARG APT_CATCHER_IP=localhost
-# RUN  echo 'Acquire::http { Proxy "http://'${APT_CATCHER_IP}':3142"; };' >> /etc/apt/apt.conf.d/01proxy
+#ARG APT_CATCHER_IP=localhost
+#RUN  echo 'Acquire::http { Proxy "http://'${APT_CATCHER_IP}':3142"; };' >> /etc/apt/apt.conf.d/01proxy
 
-# Install required dependencies and QGIS itself
+
+# Add repository for QGIS (stable or nightly)
+# ADD debian-gis.list /etc/apt/sources.list.d/debian-gis.list
+ADD debian-gis-nightly-release.list /etc/apt/sources.list.d/debian-gis-nightly-release.list
+# Add the signing key
+RUN sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key 3FF5FFCAD71472C4
+
 RUN apt-get -y update
+
+# Install QGIS itself
+RUN apt-get install -y \
+    python-qgis \
+    qgis
+
+# Install required dependencies for the test env
 RUN apt-get install -y \
     vim \
     xvfb \
@@ -27,25 +40,23 @@ ADD install.sh /usr/local/bin/install.sh
 RUN chmod +x /usr/local/bin/install.sh
 RUN /usr/local/bin/install.sh
 
-# Add qgishome with settings for the testing script
-COPY qgishome /qgishome
-
 # Add QGIS test runner
-ENV QGIS_EXTRA_OPTIONS="--optionspath /qgishome"
 ADD qgis_testrunner.py /usr/bin/qgis_testrunner.py
 RUN chmod +x /usr/bin/qgis_testrunner.py
 ADD qgis_testrunner.sh /usr/bin/qgis_testrunner.sh
 RUN chmod +x /usr/bin/qgis_testrunner.sh
+ADD qgis_setup.sh /usr/bin/qgis_setup.sh
+RUN chmod +x /usr/bin/qgis_setup.sh
 
-# Add QGIS setup script
-ADD qgis_setup.sh /usr/local/bin/qgis_setup.sh
-RUN chmod +x /usr/local/bin/qgis_setup.sh
-RUN /usr/local/bin/qgis_setup.sh
+# Monkey patch to prevent modal stacktrace on python errors
+ADD startup.py /root/.qgis2/python/startup.py
 
 # Add start script
 ADD supervisord.conf /etc/supervisor/
 ADD supervisor.xvfb.conf /etc/supervisor/supervisor.d/
 
-ENV PYTHONPATH=/usr/share/qgis/python/
+# This paths are for both kartoza images (compiled) and for deb installed
+# needed to find PyQt wrapper provided by QGIS
+ENV PYTHONPATH=/usr/share/qgis/python/:/usr/lib/python2.7/dist-packages/qgis
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
