@@ -27,11 +27,7 @@ ADD install.sh /usr/local/bin/install.sh
 RUN chmod +x /usr/local/bin/install.sh
 RUN /usr/local/bin/install.sh
 
-# Add qgishome with settings for the testing script
-COPY qgishome /qgishome
-
 # Add QGIS test runner
-ENV QGIS_EXTRA_OPTIONS="--optionspath /qgishome"
 ADD qgis_testrunner.py /usr/bin/qgis_testrunner.py
 RUN chmod +x /usr/bin/qgis_testrunner.py
 ADD qgis_testrunner.sh /usr/bin/qgis_testrunner.sh
